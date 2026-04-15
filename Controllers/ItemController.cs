@@ -1,40 +1,58 @@
+using Entities.DataTransferObjects;
 using MicroServices.ActionFilters;
 using Microsoft.AspNetCore.Mvc;
+using Services;
 
 [Route("api/items")]
 [ApiController]
 public class ItemController : ControllerBase
 {
+    private readonly ItemService _itemService;
+
+    public ItemController(ItemService itemService)
+    {
+        this._itemService = itemService;
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetThreeRandoms()
     {
-        // TODO: functionallity
-        return Ok();
+        var items = await _itemService.GetThreeRandomItems();
+
+        return Ok(items);
     }
 
     [HttpGet("{id:guid}", Name = "GetItemById")]
-    public async Task<IActionResult> GetItemById()
+    public async Task<IActionResult> GetItemById(Guid id)
     {
-        return Ok("item");
+        var item = await _itemService.GetSpecificItem(id);
+        return Ok(item);
     }
 
-    [HttpPost] //Add validations
+    [HttpPost]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> AddNewItem([FromBody] CreateItemDto item)
     {
-        return Ok("Added item");
+        var newItem = await _itemService.CreateItem(item);
+
+        return CreatedAtRoute("GetItemById", new { id = newItem.ItemId }, newItem);
     }
 
-    [HttpPut] //Add validations
+    [HttpPut("{id:guid}")]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
-    public async Task<IActionResult> UpdateItem([FromBody] UpdateItemDto item)
+    public async Task<IActionResult> UpdateItem(Guid id, [FromBody] UpdateItemDto updateItem)
     {
-        return Ok("Updated item");
+        var existingItem = await _itemService.GetSpecificItem(id);
+        await _itemService.UpdateItem(existingItem, updateItem);
+
+        return NoContent();
     }
 
-    [HttpDelete]
-    public async Task<IActionResult> DeleteItem()
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteItem(Guid id)
     {
-        return Ok("Deleted item");
+        await _itemService.RemoveItem(id);
+
+        return NoContent();
     }
 }
