@@ -1,25 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace MicroServices.ActionFilters
+namespace MicroServices.ActionFilters;
+
+public class ValidationFilterAttribute : IActionFilter
 {
-    public class ValidationFilterAttribute : IActionFilter
+    public void OnActionExecuted(ActionExecutedContext context) { }
+
+    public void OnActionExecuting(ActionExecutingContext context)
     {
-        public void OnActionExecuted(ActionExecutedContext context) { }
+        var dtoObject = context
+            .ActionArguments.SingleOrDefault(x =>
+                x.Value != null && x.Value.ToString().Contains("Dto")
+            )
+            .Value;
 
-        public void OnActionExecuting(ActionExecutingContext context)
+        if (dtoObject == null || !context.ModelState.IsValid)
         {
-            var dtoObject = context
-                .ActionArguments.SingleOrDefault(x =>
-                    x.Value != null && x.Value.ToString().Contains("Dto")
-                )
-                .Value;
-
-            if (dtoObject == null || !context.ModelState.IsValid)
-            {
-                context.Result = new BadRequestObjectResult("Object is bad");
-                return;
-            }
+            context.Result = new BadRequestObjectResult("Object is bad");
+            return;
         }
     }
 }
