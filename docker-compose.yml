@@ -1,0 +1,8 @@
+services:
+  itemservice:
+    build: ./ItemService
+    ports:
+      - "8080:8080"
+    environment:
+      - MongoDbSettings__ConnectionString=mongodb+srv://shachar_db_user:admin@csharptraining.kaeh2qh.mongodb.net/?appName=CSharpTraining
+      - MongoDbSettings__DatabaseName=ItemStore

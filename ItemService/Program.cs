@@ -37,7 +37,6 @@ if (app.Environment.IsDevelopment())
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 app.ConfigureExceptionHandler(logger);
-app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
