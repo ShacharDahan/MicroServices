@@ -14,10 +14,9 @@ public static class ExceptionMiddlewareExtensions
                 {
                     var (statusCode, message) = contextFeature.Error switch
                     {
-                        ItemNotFoundException => (StatusCodes.Status404NotFound, "Item not found!"),
+                        ItemNotFoundException ex => (StatusCodes.Status404NotFound, ex.Message),
                         _ => (StatusCodes.Status500InternalServerError, "Internal Server Error."),
                     };
-
                     context.Response.StatusCode = statusCode;
                     context.Response.ContentType = "application/json";
 

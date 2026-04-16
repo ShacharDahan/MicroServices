@@ -1,6 +1,7 @@
 using Entities.DataTransferObjects;
 using MicroServices.ActionFilters;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 using Services;
 
 [Route("api/items")]
@@ -15,7 +16,7 @@ public class ItemController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetThreeRandoms()
+    public async Task<ActionResult<Item[]>> GetThreeRandoms()
     {
         var items = await _itemService.GetThreeRandomItems();
 
@@ -23,7 +24,7 @@ public class ItemController : ControllerBase
     }
 
     [HttpGet("{id:guid}", Name = "GetItemById")]
-    public async Task<IActionResult> GetItemById(Guid id)
+    public async Task<ActionResult<Item>> GetItemById(Guid id)
     {
         var item = await _itemService.GetSpecificItem(id);
         return Ok(item);
@@ -31,7 +32,7 @@ public class ItemController : ControllerBase
 
     [HttpPost]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
-    public async Task<IActionResult> AddNewItem([FromBody] CreateItemDto item)
+    public async Task<ActionResult<Item>> AddNewItem([FromBody] CreateItemDto item)
     {
         var newItem = await _itemService.CreateItem(item);
 
